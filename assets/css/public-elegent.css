@@ -1,0 +1,1511 @@
+/* ===================================
+   SERVICE CHARGE MANAGER - COMPLETE STYLES
+   =================================== */
+
+/* ===================================
+   ROOT VARIABLES & RESET
+   =================================== */
+:root {
+    --scm-primary: #2563eb;
+    --scm-primary-dark: #1e40af;
+    --scm-primary-light: #3b82f6;
+    --scm-secondary: #64748b;
+    --scm-success: #10b981;
+    --scm-danger: #ef4444;
+    --scm-warning: #f59e0b;
+    --scm-bg: #f8fafc;
+    --scm-card-bg: #ffffff;
+    --scm-border: #e2e8f0;
+    --scm-text: #1e293b;
+    --scm-text-muted: #64748b;
+    --scm-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --scm-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --scm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --scm-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --scm-radius: 0.5rem;
+    --scm-radius-lg: 0.75rem;
+    --scm-transition: all 0.2s ease;
+}
+
+.scm-frontend * {
+    box-sizing: border-box;
+}
+
+/* ===================================
+   COMMON LAYOUT
+   =================================== */
+.scm-frontend {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--scm-text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================================
+   AUTH CONTAINER (LOGIN & SIGNUP)
+   =================================== */
+.scm-auth-container {
+    max-width: 440px;
+    margin: 2rem auto;
+    background: var(--scm-card-bg);
+    border-radius: var(--scm-radius-lg);
+    box-shadow: var(--scm-shadow-lg);
+    overflow: hidden;
+}
+
+.scm-auth-tabs {
+    display: flex;
+    background: var(--scm-bg);
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-tab-button {
+    flex: 1;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 0.938rem;
+    font-weight: 600;
+    color: var(--scm-text-muted);
+    cursor: pointer;
+    transition: var(--scm-transition);
+    position: relative;
+}
+
+.scm-tab-button:hover {
+    color: var(--scm-primary);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.scm-tab-button.active {
+    color: var(--scm-primary);
+    background: var(--scm-card-bg);
+}
+
+.scm-tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--scm-primary);
+}
+
+.scm-tab-content {
+    display: none;
+    padding: 2rem;
+}
+
+.scm-tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   REGISTRATION WRAPPER
+   =================================== */
+.scm-registration-wrapper {
+    max-width: 540px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.scm-registration-card {
+    background: var(--scm-card-bg);
+    border-radius: var(--scm-radius-lg);
+    box-shadow: var(--scm-shadow-lg);
+    padding: 2.5rem;
+}
+
+.scm-reg-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--scm-text);
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.scm-reg-subtitle {
+    text-align: center;
+    color: var(--scm-text-muted);
+    margin: 0 0 2rem 0;
+    font-size: 0.938rem;
+}
+
+.scm-reg-subtitle strong {
+    color: var(--scm-primary);
+    font-weight: 600;
+}
+
+/* ===================================
+   DASHBOARD
+   =================================== */
+.scm-dashboard {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.scm-dashboard>h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--scm-text);
+    margin: 0 0 2rem 0;
+}
+
+.scm-user-info,
+.scm-apartments-section {
+    background: var(--scm-card-bg);
+    border-radius: var(--scm-radius-lg);
+    box-shadow: var(--scm-shadow-md);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.scm-user-info h3,
+.scm-apartments-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--scm-text);
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-apartments-section h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--scm-text);
+    margin: 0 0 1rem 0;
+}
+
+/* ===================================
+   FORMS
+   =================================== */
+.scm-form {
+    width: 100%;
+}
+
+.scm-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.scm-form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--scm-text);
+    margin-bottom: 0.5rem;
+}
+
+.scm-form-group input[type="text"],
+.scm-form-group input[type="tel"],
+.scm-form-group select,
+.scm-form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.938rem;
+    color: var(--scm-text);
+    background: var(--scm-card-bg);
+    border: 1.5px solid var(--scm-border);
+    border-radius: var(--scm-radius);
+    transition: var(--scm-transition);
+    outline: none;
+}
+
+.scm-form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.scm-form-group input:focus,
+.scm-form-group select:focus,
+.scm-form-group textarea:focus {
+    border-color: var(--scm-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.scm-form-group input::placeholder,
+.scm-form-group textarea::placeholder {
+    color: var(--scm-text-muted);
+    opacity: 0.6;
+}
+
+.scm-help-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.813rem;
+    color: var(--scm-text-muted);
+}
+
+.scm-form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* ===================================
+   BUTTONS
+   =================================== */
+.scm-button,
+.scm-btn-primary,
+#scm-edit-btn,
+#scm-save-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.938rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--scm-radius);
+    cursor: pointer;
+    transition: var(--scm-transition);
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.scm-button-primary,
+.scm-btn-primary,
+#scm-save-btn {
+    background: var(--scm-primary);
+    color: white;
+    flex: 1;
+}
+
+.scm-button-primary:hover,
+.scm-btn-primary:hover,
+#scm-save-btn:hover {
+    background: var(--scm-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-button-primary:active,
+.scm-btn-primary:active {
+    transform: translateY(0);
+}
+
+.scm-button-secondary {
+    background: var(--scm-bg);
+    color: var(--scm-text);
+    border: 1.5px solid var(--scm-border);
+}
+
+.scm-button-secondary:hover {
+    background: var(--scm-border);
+}
+
+#scm-edit-btn {
+    background: var(--scm-secondary);
+    color: white;
+    margin-top: 1.5rem;
+}
+
+#scm-edit-btn:hover {
+    background: #475569;
+}
+
+.scm-btn-edit {
+    background: #FFB400;
+    color: #111827;
+    margin-top: 10px;
+    padding: 8px 18px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.scm-btn-edit:hover {
+    background: #e0a200;
+    color: #111;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.scm-btn-edit:active {
+    transform: scale(0.97);
+}
+
+.scm-btn-delete {
+    background: #dc3545;
+    /* Bootstrap-style red */
+    color: #fff;
+    padding: 8px 18px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.25s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.scm-btn-delete:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.scm-btn-delete:active {
+    transform: scale(0.97);
+}
+
+/* ===================================
+   INFO TABLE
+   =================================== */
+.scm-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.5rem;
+}
+
+.scm-info-table tr {
+    border-bottom: 1px solid var(--scm-border);
+}
+
+.scm-info-table tr:last-child {
+    border-bottom: none;
+}
+
+.scm-info-table th,
+.scm-info-table td {
+    padding: 1rem;
+    text-align: left;
+}
+
+.scm-info-table th {
+    font-weight: 600;
+    color: var(--scm-text-muted);
+    width: 30%;
+    font-size: 0.875rem;
+}
+
+.scm-info-table td {
+    color: var(--scm-text);
+    font-size: 0.938rem;
+}
+
+.scm-edit-field {
+    width: auto;
+    max-width: 200px;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border: 1.5px solid var(--scm-border);
+    border-radius: var(--scm-radius);
+    margin-right: 0.5rem;
+}
+
+.scm-edit-field:focus {
+    border-color: var(--scm-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===================================
+   APARTMENTS SECTION
+   =================================== */
+.scm-apartment-form-container,
+.scm-apartments-list-container {
+    margin-bottom: 2rem;
+}
+
+.scm-apartment-form-container:last-child,
+.scm-apartments-list-container:last-child {
+    margin-bottom: 0;
+}
+
+.scm-apartments-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scm-apartments-table {
+    width: 100%;
+    min-width: 100%;
+    border-collapse: collapse;
+    background: var(--scm-card-bg);
+    border-radius: var(--scm-radius);
+    overflow: hidden;
+    box-shadow: var(--scm-shadow-sm);
+}
+
+.scm-apartments-table thead {
+    background: var(--scm-bg);
+    display: none;
+}
+
+.scm-apartments-table th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--scm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.scm-apartments-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--scm-border);
+    font-size: 0.938rem;
+    color: var(--scm-text);
+    display: block;
+    width: 100%;
+    text-align: right;
+    position: relative;
+    padding-left: 50%;
+}
+
+.scm-apartments-table td:first-child {
+    text-align: left;
+}
+
+.scm-apartments-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    font-weight: 600;
+    color: var(--scm-text-muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.scm-apartments-table tbody tr {
+    transition: var(--scm-transition);
+    display: block;
+    margin-bottom: 1.5rem;
+    background: var(--scm-card-bg);
+    border-radius: var(--scm-radius);
+    box-shadow: var(--scm-shadow-sm);
+    border: 1px solid var(--scm-border);
+}
+
+.scm-apartments-table tbody tr:last-child {
+    margin-bottom: 0;
+}
+
+.scm-apartments-table tbody tr:hover {
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-apartment-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem !important;
+    border-top: 1px solid var(--scm-border);
+    justify-content: flex-end;
+}
+
+.scm-edit-apartment-btn,
+.scm-delete-apartment-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: var(--scm-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--scm-transition);
+}
+
+.scm-edit-apartment-btn {
+    background: var(--scm-primary);
+    color: white;
+}
+
+.scm-edit-apartment-btn:hover {
+    background: var(--scm-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-delete-apartment-btn {
+    background: var(--scm-danger);
+    color: white;
+}
+
+.scm-delete-apartment-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-loading {
+    color: var(--scm-text-muted);
+}
+
+.scm-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--scm-border);
+    border-top-color: var(--scm-primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Tablet and desktop view */
+@media (min-width: 768px) {
+    .scm-apartments-table thead {
+        display: table-header-group;
+    }
+
+    .scm-apartments-table tbody tr {
+        display: table-row;
+        margin-bottom: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .scm-apartments-table td {
+        display: table-cell;
+        padding: 1rem;
+        text-align: left;
+        border-top: 1px solid var(--scm-border);
+    }
+
+    .scm-apartments-table td:before {
+        display: none;
+    }
+
+    .scm-apartments-table tbody tr {
+        transition: var(--scm-transition);
+        background: transparent;
+    }
+
+    .scm-apartments-table tbody tr:hover {
+        background: var(--scm-bg);
+        box-shadow: none;
+    }
+
+    .scm-apartment-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem;
+        border: none;
+        justify-content: flex-end;
+    }
+}
+
+
+/* ===================================
+   RESPONSE MESSAGES
+   =================================== */
+#scm-update-response,
+#scm-apartment-form-response {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--scm-radius);
+    font-size: 0.875rem;
+    display: none;
+}
+
+#scm-update-response.success,
+#scm-apartment-form-response.success {
+    display: block;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--scm-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#scm-update-response.error,
+#scm-apartment-form-response.error {
+    display: block;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--scm-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 768px) {
+
+    .scm-auth-container,
+    .scm-registration-card {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .scm-dashboard {
+        padding: 0 1rem;
+    }
+
+    .scm-user-info,
+    .scm-apartments-section {
+        padding: 1px;
+        /* padding: 1.5rem; */
+    }
+
+    .scm-reg-title {
+        font-size: 1.5rem;
+    }
+
+    .scm-dashboard>h2 {
+        font-size: 1.75rem;
+    }
+
+    .scm-info-table th {
+        width: 40%;
+        font-size: 0.813rem;
+    }
+
+    .scm-info-table th,
+    .scm-info-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .scm-form-actions {
+        flex-direction: column;
+    }
+
+    .scm-button,
+    .scm-btn-primary {
+        width: 100%;
+    }
+
+    .scm-apartments-table {
+        font-size: 0.875rem;
+    }
+
+    .scm-apartments-table th,
+    .scm-apartments-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Stack table on very small screens */
+    .scm-apartments-table thead {
+        display: none;
+    }
+
+    .scm-apartments-table,
+    .scm-apartments-table tbody,
+    .scm-apartments-table tr,
+    .scm-apartments-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .scm-apartments-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--scm-border);
+        border-radius: var(--scm-radius);
+        padding: 0.5rem;
+    }
+
+    .scm-apartments-table td {
+        text-align: right;
+        padding: 0.5rem;
+        border: none;
+        position: relative;
+        padding-left: 50%;
+    }
+
+    .scm-apartments-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0.5rem;
+        font-weight: 600;
+        color: var(--scm-text-muted);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .scm-auth-container,
+    .scm-registration-card {
+        margin: 0.5rem;
+        padding: 1.25rem;
+    }
+
+    .scm-reg-title {
+        font-size: 1.25rem;
+    }
+
+    .scm-form-group input,
+    .scm-form-group select,
+    .scm-form-group textarea {
+        font-size: 0.875rem;
+        padding: 0.625rem 0.875rem;
+    }
+
+    .scm-button,
+    .scm-btn-primary {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+.scm-text-center {
+    text-align: center;
+}
+
+.scm-text-muted {
+    color: var(--scm-text-muted);
+}
+
+.scm-mt-1 {
+    margin-top: 0.5rem;
+}
+
+.scm-mt-2 {
+    margin-top: 1rem;
+}
+
+.scm-mb-0 {
+    margin-bottom: 0;
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+.scm-button:focus-visible,
+.scm-form-group input:focus-visible,
+.scm-form-group select:focus-visible,
+.scm-form-group textarea:focus-visible {
+    outline: 2px solid var(--scm-primary);
+    outline-offset: 2px;
+}
+
+.scm-tab-button:focus-visible {
+    outline: 2px solid var(--scm-primary);
+    outline-offset: -2px;
+}
+
+/* ===================================
+   DASHBOARD HEADER
+   =================================== */
+.scm-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-dashboard-header h2 {
+    margin: 0;
+    flex: 1;
+}
+
+/* ===================================
+   LOGOUT BUTTON
+   =================================== */
+.scm-btn-logout {
+    padding: 0.625rem 1.25rem;
+    background: var(--scm-danger);
+    color: white;
+    border: none;
+    border-radius: var(--scm-radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--scm-transition);
+    box-shadow: var(--scm-shadow);
+}
+
+.scm-btn-logout:hover {
+    background: #dc2626;
+    box-shadow: var(--scm-shadow-md);
+    transform: translateY(-1px);
+}
+
+.scm-btn-logout:active {
+    transform: translateY(0);
+}
+
+.scm-btn-logout:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 600px) {
+    .scm-dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .scm-dashboard-header h2 {
+        text-align: center;
+    }
+
+    .scm-btn-logout {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===================================
+   MOBILE APP DESIGN
+   =================================== */
+
+/* App Container */
+.scm-mobile-app {
+    display: flex;
+    flex-direction: column;
+    background: var(--scm-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* App Header */
+.scm-app-header {
+    background: linear-gradient(135deg, var(--scm-primary) 0%, var(--scm-primary-dark) 100%);
+    color: white;
+    padding: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-app-logo h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-align: center;
+}
+
+/* App Content */
+.scm-app-content {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Card Design */
+.scm-card {
+    background: var(--scm-card-bg);
+    border-radius: 12px;
+    box-shadow: var(--scm-shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--scm-transition);
+}
+
+.scm-card:active {
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-card-header {
+    padding: 1.25rem;
+    background: var(--scm-bg);
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-card-header h2 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--scm-text);
+}
+
+.scm-card-body {
+    padding: 1.25rem;
+    flex: 1;
+}
+
+.scm-card-footer {
+    padding: 1rem;
+    background: var(--scm-bg);
+    border-top: 1px solid var(--scm-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* User Info Card */
+.scm-user-info-card .scm-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.scm-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.scm-info-label {
+    /* font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--scm-text-muted); */
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--scm-text);
+    /* color: black; */
+}
+
+.scm-value {
+    font-size: 1rem;
+    color: var(--scm-text);
+    word-break: break-word;
+    font-weight: normal;
+}
+
+.scm-edit-field {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--scm-border);
+    border-radius: var(--scm-radius);
+    font-family: inherit;
+    transition: var(--scm-transition);
+}
+
+.scm-edit-field:focus {
+    border-color: var(--scm-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+/* Button Styles */
+.scm-btn-full-width {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--scm-radius);
+    cursor: pointer;
+    transition: var(--scm-transition);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scm-btn-primary {
+    background: var(--scm-primary);
+    color: white;
+    box-shadow: var(--scm-shadow-sm);
+}
+
+.scm-btn-primary:active {
+    background: var(--scm-primary-dark);
+    transform: translateY(1px);
+}
+
+.scm-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.scm-btn-success {
+    background: var(--scm-success);
+    color: white;
+    box-shadow: var(--scm-shadow-sm);
+}
+
+.scm-btn-success:active {
+    background: #059669;
+    transform: translateY(1px);
+}
+
+.scm-btn-logout {
+    background: var(--scm-danger);
+    color: white;
+    box-shadow: var(--scm-shadow-sm);
+}
+
+.scm-btn-logout:active {
+    background: #dc2626;
+    transform: translateY(1px);
+}
+
+.scm-btn-secondary {
+    background: var(--scm-primary);
+    color: white;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--scm-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--scm-transition);
+    flex: 1;
+}
+
+.scm-btn-secondary:active {
+    background: var(--scm-primary-dark);
+}
+
+.scm-btn-danger {
+    background: var(--scm-danger);
+    color: white;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--scm-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--scm-transition);
+    flex: 1;
+}
+
+.scm-btn-danger:active {
+    background: #dc2626;
+}
+
+/* Apartment Cards */
+.scm-apartment-card {
+    background: var(--scm-card-bg);
+    border: 1px solid var(--scm-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--scm-shadow-sm);
+    transition: var(--scm-transition);
+}
+
+.scm-apartment-card:last-child {
+    margin-bottom: 0;
+}
+
+.scm-apartment-card:active {
+    box-shadow: var(--scm-shadow-md);
+}
+
+.scm-apartment-card-header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, var(--scm-bg) 0%, #f5f5f5 100%);
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-apartment-card-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--scm-text);
+}
+
+.scm-apartment-card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.scm-apartment-info-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.scm-apartment-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--scm-text-muted);
+}
+
+.scm-apartment-value {
+    font-size: 0.938rem;
+    color: var(--scm-text);
+    word-break: break-word;
+}
+
+.scm-apartment-card-footer {
+    padding: 1rem 1.25rem;
+    background: var(--scm-bg);
+    border-top: 1px solid var(--scm-border);
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Empty and Error States */
+.scm-empty-state,
+.scm-error-state {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--scm-text-muted);
+}
+
+.scm-empty-state p,
+.scm-error-state p {
+    margin: 0;
+    font-size: 0.938rem;
+}
+
+.scm-empty-state {
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: var(--scm-radius);
+    border: 2px dashed var(--scm-border);
+}
+
+.scm-error-state {
+    background: rgba(239, 68, 68, 0.05);
+    border-radius: var(--scm-radius);
+    border: 2px dashed var(--scm-border);
+    color: var(--scm-danger);
+}
+
+/* Loading State */
+.scm-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem 1rem;
+    color: var(--scm-text-muted);
+}
+
+.scm-loading .scm-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--scm-border);
+    border-top-color: var(--scm-primary);
+}
+
+/* Logout Section */
+.scm-logout-section {
+    padding: 1rem 0;
+    margin-top: auto;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .scm-app-header {
+        padding: 2rem;
+    }
+
+    .scm-app-logo h1 {
+        font-size: 1.875rem;
+    }
+
+    .scm-app-content {
+        padding: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .scm-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .scm-info-row {
+        grid-template-columns: 120px 1fr;
+    }
+
+
+    .scm-apartment-info-row {
+        grid-template-columns: 120px 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .scm-app-header {
+        padding: 1rem;
+    }
+
+    .scm-app-logo h1 {
+        font-size: 1.25rem;
+    }
+
+    .scm-app-content {
+        padding: 1px;
+        /* padding: 0.75rem; */
+        /* gap: 1rem; */
+    }
+
+    .scm-card-header {
+        padding: 1rem;
+    }
+
+    .scm-card-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .scm-card-body {
+        padding: 1rem;
+    }
+
+    .scm-card-footer {
+        padding: 0.75rem;
+    }
+
+    .scm-btn-full-width {
+        padding: 0.75rem 1rem;
+        font-size: 0.938rem;
+        min-height: 44px;
+    }
+
+    /* .scm-info-row {
+        grid-template-columns: 1fr;
+    } */
+    .scm-info-row {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .scm-apartment-info-row {
+        /* grid-template-columns: 1fr; */
+        gap: 0.25rem;
+    }
+
+    .scm-apartment-card-footer {
+        flex-direction: column;
+    }
+
+    .scm-btn-secondary,
+    .scm-btn-danger {
+        flex: 1;
+        width: 100%;
+    }
+
+    .scm-apartment-label {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--scm-text);
+    }
+
+    .scm-apartment-value {
+        font-size: 1rem;
+        /* font-weight: ; */
+        font-weight: 500;
+    }
+}
+
+/***********************************************
+ * MODERN MODAL STYLING
+ ***********************************************/
+
+.scm-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.scm-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.scm-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 400px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    display: none;
+    overflow: hidden;
+}
+
+.scm-modal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.scm-modal-content {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+}
+
+.scm-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--scm-text-muted);
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.scm-modal-close:hover {
+    color: var(--scm-text);
+}
+
+.scm-modal-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.scm-modal-icon.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.scm-modal-icon.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.scm-modal-icon.info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.scm-modal-icon.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.scm-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--scm-text);
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.5px;
+}
+
+.scm-modal-description {
+    font-size: 0.938rem;
+    color: var(--scm-text-muted);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.scm-modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.scm-modal-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.938rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 150px;
+}
+
+.scm-modal-btn-primary {
+    background: linear-gradient(135deg, var(--scm-primary) 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.scm-modal-btn-primary:hover {
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transform: translateY(-2px);
+}
+
+.scm-modal-btn-secondary {
+    background: var(--scm-bg);
+    color: var(--scm-text);
+    border: 1px solid var(--scm-border);
+}
+
+.scm-modal-btn-secondary:hover {
+    background: var(--scm-border);
+}
+
+.scm-modal-btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.scm-modal-btn-danger:hover {
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+.scm-modal-btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.scm-modal-btn-warning:hover {
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+    transform: translateY(-2px);
+}
+
+.scm-modal-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.scm-modal-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}

@@ -1,0 +1,6 @@
+{
+    "name": "service-charge-manager/plugin",
+    "description": "A plugin for managing service charges with phone number based authentication and landlord management.",
+    "type": "wordpress-plugin",
+    "require": {}
+}
