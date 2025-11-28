@@ -58,6 +58,12 @@ class AjaxHandlers
         add_action('wp_ajax_scm_delete_apartment', array($this, 'handle_delete_apartment'));
         add_action('wp_ajax_scm_update_apartment', array($this, 'handle_update_apartment'));
 
+        // Flat management handlers
+        add_action('wp_ajax_scm_get_flats', array($this, 'handle_get_flats'));
+        add_action('wp_ajax_scm_add_flat', array($this, 'handle_add_flat'));
+        add_action('wp_ajax_scm_delete_flat', array($this, 'handle_delete_flat'));
+        add_action('wp_ajax_scm_update_flat', array($this, 'handle_update_flat'));
+
         // Logout handler (logged-in users only)
         add_action('wp_ajax_scm_logout', array($this, 'handle_logout'));
 
@@ -946,6 +952,10 @@ class AjaxHandlers
             return;
         }
 
+        // Delete all flats associated with this apartment first
+        $frontend = new \ServiceChargeManager\Public\Frontend();
+        $frontend->delete_flats_by_apartment($apartment_id);
+
         $result = $wpdb->delete(
             $apartments_table,
             array('id' => $apartment_id),
@@ -1047,5 +1057,138 @@ class AjaxHandlers
             'message' => __('You have been logged out successfully', 'service-charge-manager'),
             'redirect' => home_url('/index.php/show-signup-or-login/')
         ));
+    }
+
+    /**
+     * Get flats for an apartment
+     */
+    public function handle_get_flats()
+    {
+        check_ajax_referer('scm-user-nonce', 'nonce');
+
+        $apartment_id = intval($_POST['apartment_id'] ?? 0);
+
+        if (empty($apartment_id)) {
+            wp_send_json_error(array('message' => __('Invalid apartment ID', 'service-charge-manager')));
+            return;
+        }
+
+        $frontend = new \ServiceChargeManager\Public\Frontend();
+        $flats = $frontend->get_flats_by_apartment($apartment_id);
+
+        wp_send_json_success(array(
+            'flats' => $flats
+        ));
+    }
+
+    /**
+     * Add a new flat
+     */
+    public function handle_add_flat()
+    {
+        check_ajax_referer('scm-user-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => __('User not logged in', 'service-charge-manager')));
+            return;
+        }
+
+        $apartment_id = intval($_POST['apartment_id'] ?? 0);
+        $flat_name = sanitize_text_field($_POST['name'] ?? '');
+        $floor_number = sanitize_text_field($_POST['floor_number'] ?? '');
+
+        if (empty($apartment_id) || empty($flat_name)) {
+            wp_send_json_error(array('message' => __('Flat name and apartment are required', 'service-charge-manager')));
+            return;
+        }
+
+        $frontend = new \ServiceChargeManager\Public\Frontend();
+
+        $flat_data = array(
+            'apartment_id' => $apartment_id,
+            'name' => $flat_name,
+            'floor_number' => $floor_number
+        );
+
+        $flat_id = $frontend->add_flat($flat_data);
+
+        if ($flat_id) {
+            wp_send_json_success(array(
+                'message' => __('Flat added successfully', 'service-charge-manager'),
+                'flat_id' => $flat_id
+            ));
+        } else {
+            wp_send_json_error(array('message' => __('Failed to add flat', 'service-charge-manager')));
+        }
+    }
+
+    /**
+     * Delete a flat
+     */
+    public function handle_delete_flat()
+    {
+        check_ajax_referer('scm-user-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => __('User not logged in', 'service-charge-manager')));
+            return;
+        }
+
+        $flat_id = intval($_POST['flat_id'] ?? 0);
+
+        if (empty($flat_id)) {
+            wp_send_json_error(array('message' => __('Invalid flat ID', 'service-charge-manager')));
+            return;
+        }
+
+        $frontend = new \ServiceChargeManager\Public\Frontend();
+
+        if ($frontend->delete_flat($flat_id)) {
+            wp_send_json_success(array(
+                'message' => __('Flat deleted successfully', 'service-charge-manager')
+            ));
+        } else {
+            wp_send_json_error(array('message' => __('Failed to delete flat', 'service-charge-manager')));
+        }
+    }
+
+    /**
+     * Update a flat
+     */
+    public function handle_update_flat()
+    {
+        check_ajax_referer('scm-user-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => __('User not logged in', 'service-charge-manager')));
+            return;
+        }
+
+        $flat_id = intval($_POST['flat_id'] ?? 0);
+        $flat_name = sanitize_text_field($_POST['name'] ?? '');
+        $floor_number = sanitize_text_field($_POST['floor_number'] ?? '');
+
+        if (empty($flat_id) || empty($flat_name)) {
+            wp_send_json_error(array('message' => __('Flat name is required', 'service-charge-manager')));
+            return;
+        }
+
+        $frontend = new \ServiceChargeManager\Public\Frontend();
+
+        $flat_data = array(
+            'name' => $flat_name,
+            'floor_number' => $floor_number
+        );
+
+        if ($frontend->update_flat($flat_id, $flat_data)) {
+            wp_send_json_success(array(
+                'message' => __('Flat updated successfully', 'service-charge-manager')
+            ));
+        } else {
+            wp_send_json_error(array('message' => __('Failed to update flat', 'service-charge-manager')));
+        }
     }
 }

@@ -1615,10 +1615,6 @@
     font-weight: 600;
 }
 
-.scm-role-option input[type="radio"]:checked {
-    /* Checked state styling */
-}
-
 @media (max-width: 576px) {
     .scm-role-options {
         flex-direction: column;
@@ -1695,4 +1691,101 @@
 
 #scm-edit-actions button {
     flex: 1;
+}
+
+/* ===================================
+   FLAT DETAILS STYLES
+   =================================== */
+
+.scm-flats-header-card {
+    margin-bottom: 1.5rem;
+}
+
+.scm-apartment-subtitle {
+    font-size: 0.875rem;
+    color: var(--scm-text-muted);
+    margin: 0.5rem 0 0 0;
+    font-weight: normal;
+}
+
+.scm-flats-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.scm-flats-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--scm-card-bg);
+}
+
+.scm-flats-table thead {
+    background: linear-gradient(135deg, var(--scm-bg) 0%, #f5f5f5 100%);
+    border-bottom: 2px solid var(--scm-border);
+}
+
+.scm-flats-table th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--scm-text);
+    border-right: 1px solid var(--scm-border);
+}
+
+.scm-flats-table th:last-child {
+    border-right: none;
+}
+
+.scm-flats-table tbody tr {
+    border-bottom: 1px solid var(--scm-border);
+    transition: var(--scm-transition);
+}
+
+.scm-flats-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.scm-flats-table td {
+    padding: 1rem 1.25rem;
+    color: var(--scm-text);
+    border-right: 1px solid var(--scm-border);
+}
+
+.scm-flats-table td:last-child {
+    border-right: none;
+}
+
+.scm-flats-table tr.scm-loading td {
+    text-align: center;
+    padding: 2rem;
+    color: var(--scm-text-muted);
+    border: none;
+}
+
+.scm-back-button-section {
+    margin: 1.5rem 0;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+    .scm-flats-table {
+        font-size: 0.875rem;
+    }
+
+    .scm-flats-table th,
+    .scm-flats-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .scm-flats-table th,
+    .scm-flats-table td {
+        padding: 0.625rem 0.375rem;
+        font-size: 0.8125rem;
+    }
 }

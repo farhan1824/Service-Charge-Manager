@@ -11,6 +11,7 @@ class Installer
      */
     public function run()
     {
+        ServiceChargeManagerActivator::activate();
         $this->add_version();
     }
 

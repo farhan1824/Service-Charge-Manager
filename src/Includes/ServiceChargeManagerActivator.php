@@ -72,6 +72,50 @@ class ServiceChargeManagerActivator
             dbDelta($sql);
         }
 
+        // Create flats table
+        $flats_table = $wpdb->prefix . 'scm_flats';
+        $flats_exists = $wpdb->get_var("SHOW TABLES LIKE '$flats_table'");
+
+        if ($flats_exists !== $flats_table) {
+            $charset_collate = $wpdb->get_charset_collate();
+            $apartments_table = $wpdb->prefix . 'apartments';
+            $users_table = $wpdb->prefix . 'users';
+
+            $sql = "CREATE TABLE IF NOT EXISTS $flats_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        apartment_id BIGINT(20) UNSIGNED NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        floor_number VARCHAR(50) DEFAULT NULL,
+        holder_id BIGINT(20) UNSIGNED DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_by BIGINT(20) UNSIGNED NOT NULL,
+        updated_by BIGINT(20) UNSIGNED DEFAULT NULL,
+
+        PRIMARY KEY (id),
+
+        -- Indexes
+        INDEX apartment_id (apartment_id),
+        INDEX holder_id (holder_id),
+        INDEX created_by (created_by),
+        INDEX updated_by (updated_by),
+
+        -- Foreign Keys
+        CONSTRAINT fk_scm_flats_apartment 
+            FOREIGN KEY (apartment_id) REFERENCES {$apartments_table}(id) ON DELETE CASCADE,
+
+        CONSTRAINT fk_scm_flats_created_by 
+            FOREIGN KEY (created_by) REFERENCES {$users_table}(ID) ON DELETE RESTRICT,
+
+        CONSTRAINT fk_scm_flats_updated_by 
+            FOREIGN KEY (updated_by) REFERENCES {$users_table}(ID) ON DELETE SET NULL
+
+    ) $charset_collate;";
+
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            dbDelta($sql);
+        }
+
         // Create necessary roles
         add_role(
             'landlord',

@@ -24,6 +24,7 @@ class Frontend
         add_shortcode('scm_auth', array($this, 'render_auth_tabs'));
         add_shortcode('scm_registration_details', array($this, 'render_registration_details'));
         add_shortcode('scm_dashboard', array($this, 'render_dashboard'));
+        add_shortcode('scm_flat_details', array($this, 'render_flat_details'));
     }
 
     /**
@@ -184,5 +185,192 @@ class Frontend
             return 63072000; // 2 years in seconds
         }
         return $expiration;
+    }
+
+    /**
+     * Render flat details view
+     *
+     * @param array $atts Shortcode attributes
+     * @return string HTML output
+     */
+    public function render_flat_details($atts = [])
+    {
+        // Get apartment ID from shortcode attribute
+        $apartment_id = isset($atts['apartment_id']) ? intval($atts['apartment_id']) : 0;
+
+        // If apartment_id not provided in shortcode, try to get from session/query param
+        if (empty($apartment_id) && isset($_GET['apartment_id'])) {
+            $apartment_id = intval($_GET['apartment_id']);
+        }
+
+        if (empty($apartment_id)) {
+            return '<p>' . esc_html__('No apartment selected. Please select an apartment first.', 'service-charge-manager') . '</p>';
+        }
+
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return '<p>' . esc_html__('Please log in to view flat details.', 'service-charge-manager') . '</p>';
+        }
+
+        // Get apartment data
+        global $wpdb;
+        $apartment = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}apartments WHERE id = %d",
+            $apartment_id
+        ));
+
+        if (!$apartment) {
+            return '<p>' . esc_html__('Apartment not found.', 'service-charge-manager') . '</p>';
+        }
+
+        // Prepare apartment data for view
+        $apartment_data = [
+            'id' => $apartment->id,
+            'name' => $apartment->name,
+            'location' => $apartment->location,
+            'created_by' => $apartment->created_by
+        ];
+
+        ob_start();
+        $view_file = SCM_PLUGIN_DIR . 'src/Public/Views/flat-details.php';
+
+        if (file_exists($view_file)) {
+            include $view_file;
+        } else {
+            echo '<p>' . esc_html__('Flat details view is temporarily unavailable.', 'service-charge-manager') . '</p>';
+        }
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Get all flats for an apartment
+     *
+     * @param int $apartment_id
+     * @return array
+     */
+    public function get_flats_by_apartment($apartment_id)
+    {
+        global $wpdb;
+        $apartment_id = intval($apartment_id);
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $flats = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $flats_table WHERE apartment_id = %d ORDER BY created_at DESC",
+            $apartment_id
+        ));
+
+        return $flats ? $flats : [];
+    }
+
+    /**
+     * Add a new flat
+     *
+     * @param array $data Flat data
+     * @return int|false Flat ID on success, false on failure
+     */
+    public function add_flat($data)
+    {
+        global $wpdb;
+        $user_id = get_current_user_id();
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $insert_data = [
+            'apartment_id' => intval($data['apartment_id'] ?? 0),
+            'name' => sanitize_text_field($data['name'] ?? ''),
+            'floor_number' => sanitize_text_field($data['floor_number'] ?? ''),
+            'created_by' => $user_id,
+            'updated_by' => $user_id,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql'),
+        ];
+
+        // Validate required fields
+        if (empty($insert_data['apartment_id']) || empty($insert_data['name'])) {
+            return false;
+        }
+
+        $result = $wpdb->insert(
+            $flats_table,
+            $insert_data,
+            ['%d', '%s', '%s', '%d', '%s', '%s', '%s']
+        );
+
+        if ($result) {
+            return $wpdb->insert_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Update a flat
+     *
+     * @param int $flat_id
+     * @param array $data
+     * @return bool
+     */
+    public function update_flat($flat_id, $data)
+    {
+        global $wpdb;
+        $user_id = get_current_user_id();
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $update_data = [
+            'name' => sanitize_text_field($data['name'] ?? ''),
+            'floor_number' => sanitize_text_field($data['floor_number'] ?? ''),
+            'updated_by' => $user_id,
+            'updated_at' => current_time('mysql'),
+        ];
+
+        $result = $wpdb->update(
+            $flats_table,
+            $update_data,
+            ['id' => intval($flat_id)],
+            ['%s', '%s', '%d', '%s'],
+            ['%d']
+        );
+
+        return $result !== false;
+    }
+
+    /**
+     * Delete a flat
+     *
+     * @param int $flat_id
+     * @return bool
+     */
+    public function delete_flat($flat_id)
+    {
+        global $wpdb;
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $result = $wpdb->delete(
+            $flats_table,
+            ['id' => intval($flat_id)],
+            ['%d']
+        );
+
+        return $result !== false;
+    }
+
+    /**
+     * Delete all flats for an apartment
+     *
+     * @param int $apartment_id
+     * @return bool
+     */
+    public function delete_flats_by_apartment($apartment_id)
+    {
+        global $wpdb;
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $result = $wpdb->delete(
+            $flats_table,
+            ['apartment_id' => intval($apartment_id)],
+            ['%d']
+        );
+
+        return $result !== false;
     }
 }

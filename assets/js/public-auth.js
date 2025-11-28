@@ -921,6 +921,27 @@ jQuery(document).ready(function ($) {
   }
 
   /****************************************************
+   * APARTMENT CARD CLICK - VIEW FLATS
+   ****************************************************/
+
+  // Click on apartment card to view flats
+  $(document).on("click", ".scm-apartment-card", function (e) {
+    // Don't navigate if clicking on edit/delete icons
+    if ($(e.target).closest(".scm-apartment-icons").length) {
+      return;
+    }
+
+    const apartmentId = $(this).data("apartment-id");
+    if (apartmentId) {
+      // Navigate to flat-details page with apartment ID
+      window.location.href =
+        scmAuth.siteUrl +
+        "/index.php/flat-details/?apartment_id=" +
+        apartmentId;
+    }
+  });
+
+  /****************************************************
    * APARTMENT EDIT & DELETE ICONS
    ****************************************************/
 
@@ -1164,5 +1185,177 @@ jQuery(document).ready(function ($) {
         },
       ],
     });
+  });
+
+  /****************************************************
+   * FLAT MANAGEMENT (Flat Details Page)
+   ****************************************************/
+
+  // Load flats when page loads
+  if (
+    $("#scm-flats-tbody").length > 0 &&
+    typeof window.scmApartmentId !== "undefined"
+  ) {
+    loadFlats();
+  }
+
+  // Load flats via AJAX
+  function loadFlats() {
+    const apartmentId = window.scmApartmentId;
+
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_get_flats",
+        nonce: scmAuth.user_nonce,
+        apartment_id: apartmentId,
+      },
+      success: function (response) {
+        if (response.success && response.data.flats) {
+          const flats = response.data.flats;
+          const container = $("#scm-flats-tbody");
+          container.empty();
+
+          if (flats.length === 0) {
+            container.append(
+              '<tr><td colspan="3" class="scm-empty-state"><p>No flats yet. Add one using the + button above.</p></td></tr>'
+            );
+            return;
+          }
+
+          flats.forEach(function (flat) {
+            container.append(
+              '<tr data-flat-id="' +
+                flat.id +
+                '">' +
+                "<td>" +
+                escapeHtml(flat.name) +
+                "</td>" +
+                "<td>" +
+                escapeHtml(flat.floor_number || "-") +
+                "</td>" +
+                "<td>-</td>" +
+                "</tr>"
+            );
+          });
+        } else {
+          $("#scm-flats-tbody").html(
+            '<tr><td colspan="3" class="scm-error-state"><p>Failed to load flats.</p></td></tr>'
+          );
+        }
+      },
+      error: function () {
+        $("#scm-flats-tbody").html(
+          '<tr><td colspan="3" class="scm-error-state"><p>Error loading flats.</p></td></tr>'
+        );
+      },
+    });
+  }
+
+  // Add flat button click handler
+  $(document).on("click", "#scm-add-flat-icon-btn", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Add flat icon clicked");
+
+    const addFlatModalConfig = {
+      title: "Add New Flat",
+      description: "",
+      icon: "info",
+      buttons: [
+        {
+          text: "Cancel",
+          type: "secondary",
+          action: null,
+          closeModal: true,
+        },
+        {
+          text: "Add Flat",
+          type: "primary",
+          action: handleAddFlatFromModal,
+        },
+      ],
+      customContent:
+        '<form id="scm-flat-modal-form">' +
+        '<div class="scm-form-group">' +
+        '<label for="scm-modal-flat-name">Flat Name <span class="scm-required">*</span></label>' +
+        '<input type="text" id="scm-modal-flat-name" name="flat_name" required placeholder="e.g., Flat 101">' +
+        "</div>" +
+        '<div class="scm-form-group">' +
+        '<label for="scm-modal-flat-floor">Floor Number</label>' +
+        '<input type="text" id="scm-modal-flat-floor" name="flat_floor" placeholder="e.g., 1st, 2nd, Ground">' +
+        "</div>" +
+        "</form>",
+    };
+
+    showModalWithCustomContent(addFlatModalConfig);
+  });
+
+  // Handle flat form submission from modal
+  function handleAddFlatFromModal() {
+    const flatName = $("#scm-modal-flat-name").val().trim();
+    const flatFloor = $("#scm-modal-flat-floor").val().trim();
+    const apartmentId = window.scmApartmentId;
+
+    if (!flatName) {
+      showModal({
+        title: "Missing Information",
+        description: "Please enter the flat name.",
+        icon: "warning",
+        buttons: [{ text: "OK", type: "primary", action: null }],
+      });
+      return;
+    }
+
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_add_flat",
+        nonce: scmAuth.user_nonce,
+        apartment_id: apartmentId,
+        name: flatName,
+        floor_number: flatFloor,
+      },
+      beforeSend: function () {
+        console.log("Adding flat:", flatName);
+      },
+      success: function (response) {
+        if (response.success) {
+          showModal({
+            title: "Flat Added",
+            description: "The flat has been added successfully!",
+            icon: "success",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+          // Close modal and reload flats
+          $(".scm-modal-overlay").remove();
+          loadFlats();
+        } else {
+          showModal({
+            title: "Add Failed",
+            description: response.data.message || "Failed to add flat.",
+            icon: "error",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+        }
+      },
+      error: function () {
+        showModal({
+          title: "Add Error",
+          description: "An error occurred while adding the flat.",
+          icon: "error",
+          buttons: [{ text: "OK", type: "primary", action: null }],
+        });
+      },
+    });
+  }
+
+  // Back to apartments button
+  $(document).on("click", "#scm-back-to-apartments-btn", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = scmAuth.dashboard_url || home_url();
   });
 });

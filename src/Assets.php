@@ -105,6 +105,7 @@ class Assets
         // Localize script
         wp_localize_script('scm-public-auth', 'scmAuth', [
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'siteUrl' => home_url(),
             'login_nonce'  => wp_create_nonce('scm_login'),
             'signup_nonce' => wp_create_nonce('scm_signup'),
             'user_nonce'   => wp_create_nonce('scm-user-nonce'),
