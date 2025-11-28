@@ -47,7 +47,9 @@ if (!isset($user_data)) {
 
                 <div class="scm-info-row">
                     <span class="scm-info-label"><?php echo esc_html__('Phone', 'service-charge-manager'); ?></span>
-                    <span class="scm-value" data-key="phone"><?php echo esc_html($user_data['phone']); ?></span>
+                    <span class="scm-value" data-key="phone"><?php echo esc_html($user_data['phone']); ?><?php if (empty($user_data['phone'])) {
+                                                                                                                echo '<!-- Phone is empty in $user_data -->';
+                                                                                                            } ?></span>
                 </div>
 
                 <div class="scm-info-row">

@@ -795,7 +795,17 @@ class AjaxHandlers
         ]);
 
         // Update user meta with prefix
-        update_user_meta($user_id, 'scm_phone', $phone);
+        if (!empty($phone)) {
+            update_user_meta($user_id, 'scm_phone', $phone);
+        } else {
+            // If phone not provided, try to populate from username as fallback
+            $user = get_user_by('id', $user_id);
+            if ($user && strpos($user->user_login, 'scm_') === 0) {
+                $extracted_phone = substr($user->user_login, 4); // Remove 'scm_' prefix
+                update_user_meta($user_id, 'scm_phone', $extracted_phone);
+            }
+        }
+
         update_user_meta($user_id, 'scm_address', $address);
 
         wp_send_json_success(['message' => 'Profile updated successfully']);

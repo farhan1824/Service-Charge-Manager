@@ -16,17 +16,6 @@ if (!session_id()) {
     session_start();
 }
 
-// // Verify the user is following proper workflow
-// if (!isset($_SESSION['scm_verified_phone']) || empty($_SESSION['scm_verified_phone'])) {
-//     wp_safe_redirect(home_url('/login/'));
-//     exit;
-// }
-
-// // If user is already logged in, redirect to dashboard
-// if (is_user_logged_in()) {
-//     wp_safe_redirect(home_url('/dashboard/'));
-//     exit;
-// }
 
 $phone = isset($_SESSION['scm_verified_phone']) ? $_SESSION['scm_verified_phone'] : '';
 ?>
@@ -64,26 +53,6 @@ $phone = isset($_SESSION['scm_verified_phone']) ? $_SESSION['scm_verified_phone'
                     <label for="reg-name"><?php _e('Full Name', 'service-charge-manager'); ?></label>
                     <input type="text" id="reg-name" name="name" required placeholder="Enter your full name">
                 </div>
-
-                <!-- <div class="scm-form-group">
-                    <label for="reg-district"><?php _e('District', 'service-charge-manager'); ?></label>
-                    <select id="reg-district" name="district" required>
-                        <option value=""><?php _e('Select your district', 'service-charge-manager'); ?></option>
-                        <?php
-                        // $districts = [
-                        //     'north' => __('North District', 'service-charge-manager'),
-                        //     'south' => __('South District', 'service-charge-manager'),
-                        //     'east' => __('East District', 'service-charge-manager'),
-                        //     'west' => __('West District', 'service-charge-manager'),
-                        //     'central' => __('Central District', 'service-charge-manager'),
-                        // ];
-
-                        // foreach ($districts as $key => $label) {
-                        //     printf('<option value="%s">%s</option>', esc_attr($key), esc_html($label));
-                        // }
-                        ?>
-                    </select>
-                </div> -->
 
                 <div class="scm-form-group">
                     <label for="reg-address"><?php _e('Address', 'service-charge-manager'); ?></label>

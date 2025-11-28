@@ -876,9 +876,17 @@ jQuery(document).ready(function ($) {
               '<div class="scm-apartment-card" data-apartment-id="' +
                 apt.id +
                 '">' +
-                '<div class="scm-apartment-card-header"><h3>' +
+                '<div class="scm-apartment-card-header"><div class="scm-apartment-header-top"><h3>' +
                 escapeHtml(apt.name) +
-                "</h3></div>" +
+                '</h3><div class="scm-apartment-icons"><button type="button" class="scm-edit-apartment-icon-btn" data-apartment-id="' +
+                apt.id +
+                '" data-name="' +
+                escapeAttr(apt.name) +
+                '" data-location="' +
+                escapeAttr(apt.location || "") +
+                '" title="Edit apartment">✎</button><button type="button" class="scm-delete-apartment-icon-btn" data-apartment-id="' +
+                apt.id +
+                '" title="Delete apartment">🗑</button></div></div></div>' +
                 '<div class="scm-apartment-card-body">' +
                 '<div class="scm-apartment-info-row"><span class="scm-apartment-label">Location:</span><span class="scm-apartment-value">' +
                 escapeHtml(apt.location || "N/A") +
@@ -910,6 +918,188 @@ jQuery(document).ready(function ($) {
   // Load apartments on dashboard page load
   if ($("#scm-apartments-tbody").length > 0) {
     loadApartments();
+  }
+
+  /****************************************************
+   * APARTMENT EDIT & DELETE ICONS
+   ****************************************************/
+
+  // Edit apartment icon click handler
+  $(document).on("click", ".scm-edit-apartment-icon-btn", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Edit apartment icon clicked");
+
+    const apartmentId = $(this).data("apartment-id");
+    const apartmentName = $(this).data("name");
+    const apartmentLocation = $(this).data("location");
+
+    // Create modal for editing apartment
+    const editModalConfig = {
+      title: "Edit Apartment",
+      description: "",
+      icon: "info",
+      buttons: [
+        {
+          text: "Cancel",
+          type: "secondary",
+          action: null,
+          closeModal: true,
+        },
+        {
+          text: "Save Changes",
+          type: "primary",
+          action: function () {
+            handleEditApartmentFromModal(apartmentId);
+          },
+        },
+      ],
+      customContent:
+        '<form id="scm-edit-apartment-modal-form">' +
+        '<div class="scm-form-group">' +
+        '<label for="scm-modal-edit-apt-name">Apartment Name <span class="scm-required">*</span></label>' +
+        '<input type="text" id="scm-modal-edit-apt-name" name="apartment_name" required placeholder="e.g., Apartment 101" value="' +
+        escapeAttr(apartmentName) +
+        '">' +
+        "</div>" +
+        '<div class="scm-form-group">' +
+        '<label for="scm-modal-edit-apt-location">Location (Optional)</label>' +
+        '<input type="text" id="scm-modal-edit-apt-location" name="apartment_location" placeholder="e.g., Building A, Floor 3" value="' +
+        escapeAttr(apartmentLocation) +
+        '">' +
+        "</div>" +
+        "</form>",
+    };
+
+    showModalWithCustomContent(editModalConfig);
+  });
+
+  // Delete apartment icon click handler
+  $(document).on("click", ".scm-delete-apartment-icon-btn", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Delete apartment icon clicked");
+
+    const apartmentId = $(this).data("apartment-id");
+    const apartmentCard = $(this).closest(".scm-apartment-card");
+
+    showModal({
+      title: "Delete Apartment?",
+      description:
+        "Are you sure you want to delete this apartment? This action cannot be undone.",
+      icon: "warning",
+      buttons: [
+        { text: "Cancel", type: "secondary", action: null },
+        {
+          text: "Delete",
+          type: "danger",
+          action: function () {
+            handleDeleteApartment(apartmentId);
+          },
+        },
+      ],
+    });
+  });
+
+  // Handle apartment edit submission from modal
+  function handleEditApartmentFromModal(apartmentId) {
+    const apartmentName = $("#scm-modal-edit-apt-name").val().trim();
+    const apartmentLocation = $("#scm-modal-edit-apt-location").val().trim();
+
+    if (!apartmentName) {
+      showModal({
+        title: "Missing Information",
+        description: "Please enter the apartment name.",
+        icon: "warning",
+        buttons: [{ text: "OK", type: "primary", action: null }],
+      });
+      return;
+    }
+
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_update_apartment",
+        nonce: scmAuth.user_nonce,
+        apartment_id: apartmentId,
+        name: apartmentName,
+        location: apartmentLocation,
+      },
+      beforeSend: function () {
+        console.log("Updating apartment:", apartmentId);
+      },
+      success: function (response) {
+        if (response.success) {
+          showModal({
+            title: "Apartment Updated",
+            description: "The apartment has been updated successfully!",
+            icon: "success",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+          // Close modal and reload apartments
+          $(".scm-modal-overlay").remove();
+          loadApartments();
+        } else {
+          showModal({
+            title: "Update Failed",
+            description: response.data.message || "Failed to update apartment.",
+            icon: "error",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+        }
+      },
+      error: function () {
+        showModal({
+          title: "Update Error",
+          description: "An error occurred while updating the apartment.",
+          icon: "error",
+          buttons: [{ text: "OK", type: "primary", action: null }],
+        });
+      },
+    });
+  }
+
+  // Handle apartment delete
+  function handleDeleteApartment(apartmentId) {
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_delete_apartment",
+        nonce: scmAuth.user_nonce,
+        apartment_id: apartmentId,
+      },
+      beforeSend: function () {
+        console.log("Deleting apartment:", apartmentId);
+      },
+      success: function (response) {
+        if (response.success) {
+          showModal({
+            title: "Deleted",
+            description: "The apartment has been deleted successfully!",
+            icon: "success",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+          loadApartments(); // Refresh the list
+        } else {
+          showModal({
+            title: "Delete Failed",
+            description: response.data.message || "Failed to delete apartment.",
+            icon: "error",
+            buttons: [{ text: "OK", type: "primary", action: null }],
+          });
+        }
+      },
+      error: function () {
+        showModal({
+          title: "Delete Error",
+          description: "An error occurred while deleting the apartment.",
+          icon: "error",
+          buttons: [{ text: "OK", type: "primary", action: null }],
+        });
+      },
+    });
   }
 
   /****************************************************

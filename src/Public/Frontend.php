@@ -97,6 +97,18 @@ class Frontend
         $current_user = wp_get_current_user();
         $user_meta = get_user_meta($current_user->ID);
 
+        // Debug: Log the phone meta
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            \ServiceChargeManager\Includes\Debug::log('User meta for phone:', isset($user_meta['scm_phone']) ? $user_meta['scm_phone'] : 'NOT FOUND');
+        }
+
+        // Get phone from meta, or extract from username as fallback
+        $phone_value = $user_meta['scm_phone'][0] ?? '';
+        if (empty($phone_value) && strpos($current_user->user_login, 'scm_') === 0) {
+            // Extract phone from username (e.g., scm_8801234567890 -> 8801234567890)
+            $phone_value = substr($current_user->user_login, 4); // Remove 'scm_' prefix
+        }
+
         // Get the user's role - check both custom meta and WordPress roles
         $scm_role = $user_meta['scm_role'][0] ?? 'tenant';
         $has_manager_role = in_array('scm_manager', (array)$current_user->roles);
@@ -107,7 +119,7 @@ class Frontend
             'first_name' => $user_meta['first_name'][0] ?? '',
             'last_name' => $user_meta['last_name'][0] ?? '',
             'email' => $current_user->user_email,
-            'phone' => $this->normalize_phone_display($user_meta['scm_phone'][0] ?? ''),
+            'phone' => $this->normalize_phone_display($phone_value),
             'address' => $user_meta['scm_address'][0] ?? '',
             'city' => $user_meta['scm_city'][0] ?? '',
             'district' => $user_meta['scm_city'][0] ?? '', // Using city field to store district
