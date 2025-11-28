@@ -1509,3 +1509,130 @@
     transform: none;
     box-shadow: none;
 }
+
+/* ===================================
+   ROLE SELECTION OPTIONS
+   =================================== */
+.scm-role-options {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+}
+
+.scm-role-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    padding: 1rem;
+    background: var(--scm-bg);
+    border: 2px solid var(--scm-border);
+    border-radius: var(--scm-radius);
+    cursor: pointer;
+    transition: var(--scm-transition);
+}
+
+.scm-role-option:hover {
+    border-color: var(--scm-primary-light);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.scm-role-option input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--scm-primary);
+}
+
+.scm-role-option span {
+    font-weight: 500;
+    color: var(--scm-text);
+    user-select: none;
+}
+
+.scm-role-option input[type="radio"]:checked+span {
+    color: var(--scm-primary);
+    font-weight: 600;
+}
+
+.scm-role-option input[type="radio"]:checked {
+    /* Checked state styling */
+}
+
+@media (max-width: 576px) {
+    .scm-role-options {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .scm-role-option {
+        padding: 0.875rem;
+    }
+}
+
+/* ===================================
+   DASHBOARD HEADER ICONS & BUTTONS
+   =================================== */
+.scm-card-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.scm-card-header-top h2 {
+    flex: 1;
+    margin: 0;
+}
+
+.scm-edit-icon-btn,
+.scm-add-icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--scm-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--scm-radius);
+    transition: var(--scm-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.scm-edit-icon-btn:hover,
+.scm-add-icon-btn:hover {
+    background: rgba(37, 99, 235, 0.1);
+    transform: scale(1.1);
+}
+
+.scm-edit-icon-btn:active,
+.scm-add-icon-btn:active {
+    transform: scale(0.95);
+}
+
+/* Modal form styling */
+#scm-apartment-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.scm-required {
+    color: var(--scm-danger);
+}
+
+/* Edit actions buttons */
+#scm-edit-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+#scm-edit-actions button {
+    flex: 1;
+}

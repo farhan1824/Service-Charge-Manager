@@ -29,6 +29,17 @@ class UserManager
         // Generate a random password (user can set it later if needed)
         $password = wp_generate_password(16, true, true);
 
+        // Determine WordPress role based on scm_role
+        // If user selected "manager", assign them to the scm_manager role (or use a manager capability)
+        // If user selected "subscriber" (or "flatholder"), use the default subscriber role
+        $wp_role = 'subscriber'; // Default to subscriber
+        if (!empty($userData['scm_role'])) {
+            if ($userData['scm_role'] === 'manager') {
+                $wp_role = 'subscriber'; // Start as subscriber, may be promoted to manager role later
+            }
+            // scm_role will be stored in meta, not as WP role directly
+        }
+
         // Create WP user
         $userArgs = array(
             'user_login' => $username,
@@ -37,7 +48,7 @@ class UserManager
             'display_name' => trim($userData['first_name'] . ' ' . $userData['last_name']),
             'first_name' => $userData['first_name'] ?? '',
             'last_name' => $userData['last_name'] ?? '',
-            'role' => 'subscriber' // Default WP role
+            'role' => $wp_role
         );
 
         $user_id = wp_insert_user($userArgs);

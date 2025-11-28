@@ -50,7 +50,7 @@ class AjaxHandlers
         // User management handlers
         add_action('wp_ajax_scm_assign_role', array($this, 'assign_role'));
         add_action('wp_ajax_scm_update_user', array($this, 'update_user'));
-        add_action('wp_ajax_scm_update_profile_inline', 'scm_update_profile_inline');
+        add_action('wp_ajax_scm_update_profile_inline', array($this, 'handle_update_profile_inline'));
 
         // Apartment management handlers (manager only)
         add_action('wp_ajax_scm_add_apartment', array($this, 'handle_add_apartment'));
@@ -508,6 +508,12 @@ class AjaxHandlers
         $postal_code = isset($_POST['postal_code']) ? sanitize_text_field($_POST['postal_code']) : '';
         $country = isset($_POST['country']) ? sanitize_text_field($_POST['country']) : '';
 
+        // Get user-selected role from registration form
+        $selected_role = isset($_POST['scm_role']) ? sanitize_text_field($_POST['scm_role']) : 'flatholder';
+
+        // Map "flatholder" to internal role "subscriber", "manager" stays as "manager"
+        $scm_role = ($selected_role === 'manager') ? 'manager' : 'subscriber';
+
         // Prepare user data in the shape expected by UserManager
         $userData = array(
             'phone' => $phone,
@@ -519,7 +525,7 @@ class AjaxHandlers
             'state' => $state,
             'postal_code' => $postal_code,
             'country' => $country,
-            'scm_role' => 'tenant',
+            'scm_role' => $scm_role,
             'scm_status' => 'active'
         );
 
@@ -751,7 +757,6 @@ class AjaxHandlers
             ));
             return;
         }
-
         // Remove manager role
         $user->remove_role('scm_manager');
 
@@ -763,7 +768,11 @@ class AjaxHandlers
             'message' => __('Manager role revoked successfully.', 'service-charge-manager')
         ));
     }
-    function scm_update_profile_inline()
+
+    /**
+     * Update profile inline (AJAX handler)
+     */
+    public function handle_update_profile_inline()
     {
         check_ajax_referer('scm_update_profile_nonce', 'nonce'); // Verify nonce
 
@@ -805,19 +814,22 @@ class AjaxHandlers
             return;
         }
 
-        // Check if user is manager
+        // Check if user is manager (check both WordPress role and custom meta)
         $user = get_userdata($user_id);
-        if (!in_array('scm_manager', (array)$user->roles)) {
+        $scm_role = get_user_meta($user_id, 'scm_role', true);
+        $is_manager = in_array('scm_manager', (array)$user->roles) || $scm_role === 'manager';
+
+        if (!$is_manager) {
             wp_send_json_error(array('message' => __('Only managers can add apartments', 'service-charge-manager')));
             return;
         }
 
-        // Validate input
+        // Validate input - name is required, location is optional
         $name = sanitize_text_field($_POST['name'] ?? '');
-        $location = sanitize_text_field($_POST['location'] ?? '');
+        $location = isset($_POST['location']) && $_POST['location'] !== 'null' ? sanitize_text_field($_POST['location']) : null;
 
-        if (empty($name) || empty($location)) {
-            wp_send_json_error(array('message' => __('Apartment name and location are required', 'service-charge-manager')));
+        if (empty($name)) {
+            wp_send_json_error(array('message' => __('Apartment name is required', 'service-charge-manager')));
             return;
         }
 
@@ -832,7 +844,7 @@ class AjaxHandlers
                 'created_by' => $user_id,
                 'created_at' => current_time('mysql')
             ),
-            array('%s', '%s', '%d', '%s')
+            array('%s', $location !== null ? '%s' : null, '%d', '%s')
         );
 
         if ($result === false) {
@@ -860,9 +872,12 @@ class AjaxHandlers
             return;
         }
 
-        // Check if user is manager
+        // Check if user is manager (check both WordPress role and custom meta)
         $user = get_userdata($user_id);
-        if (!in_array('scm_manager', (array)$user->roles)) {
+        $scm_role = get_user_meta($user_id, 'scm_role', true);
+        $is_manager = in_array('scm_manager', (array)$user->roles) || $scm_role === 'manager';
+
+        if (!$is_manager) {
             wp_send_json_error(array('message' => __('Only managers can view apartments', 'service-charge-manager')));
             return;
         }
@@ -891,9 +906,12 @@ class AjaxHandlers
             return;
         }
 
-        // Check if user is manager
+        // Check if user is manager (check both WordPress role and custom meta)
         $user = get_userdata($user_id);
-        if (!in_array('scm_manager', (array)$user->roles)) {
+        $scm_role = get_user_meta($user_id, 'scm_role', true);
+        $is_manager = in_array('scm_manager', (array)$user->roles) || $scm_role === 'manager';
+
+        if (!$is_manager) {
             wp_send_json_error(array('message' => __('Only managers can delete apartments', 'service-charge-manager')));
             return;
         }
@@ -945,18 +963,21 @@ class AjaxHandlers
             return;
         }
 
-        // Check if user is manager
+        // Check if user is manager (check both WordPress role and custom meta)
         $user = get_userdata($user_id);
-        if (!in_array('scm_manager', (array)$user->roles)) {
+        $scm_role = get_user_meta($user_id, 'scm_role', true);
+        $is_manager = in_array('scm_manager', (array)$user->roles) || $scm_role === 'manager';
+
+        if (!$is_manager) {
             wp_send_json_error(array('message' => __('Only managers can update apartments', 'service-charge-manager')));
             return;
         }
 
         $apartment_id = intval($_POST['apartment_id'] ?? 0);
         $name = sanitize_text_field($_POST['name'] ?? '');
-        $location = sanitize_text_field($_POST['location'] ?? '');
+        $location = isset($_POST['location']) && $_POST['location'] !== 'null' ? sanitize_text_field($_POST['location']) : null;
 
-        if ($apartment_id <= 0 || empty($name) || empty($location)) {
+        if ($apartment_id <= 0 || empty($name)) {
             wp_send_json_error(array('message' => __('Invalid input data', 'service-charge-manager')));
             return;
         }

@@ -97,6 +97,11 @@ class Frontend
         $current_user = wp_get_current_user();
         $user_meta = get_user_meta($current_user->ID);
 
+        // Get the user's role - check both custom meta and WordPress roles
+        $scm_role = $user_meta['scm_role'][0] ?? 'tenant';
+        $has_manager_role = in_array('scm_manager', (array)$current_user->roles);
+        $is_manager = ($scm_role === 'manager' || $has_manager_role);
+
         // Prepare user data for the view
         $user_data = array(
             'first_name' => $user_meta['first_name'][0] ?? '',
@@ -109,8 +114,8 @@ class Frontend
             'state' => $user_meta['scm_state'][0] ?? '',
             'postal_code' => $user_meta['scm_postal_code'][0] ?? '',
             'country' => $user_meta['scm_country'][0] ?? '',
-            'role' => $user_meta['scm_role'][0] ?? 'tenant',
-            'is_manager' => in_array('scm_manager', (array)$current_user->roles)
+            'role' => $scm_role,
+            'is_manager' => $is_manager
         );
 
         if (file_exists($view_file)) {

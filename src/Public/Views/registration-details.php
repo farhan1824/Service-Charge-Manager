@@ -45,6 +45,21 @@ $phone = isset($_SESSION['scm_verified_phone']) ? $_SESSION['scm_verified_phone'
                     <input type="hidden" name="phone" value="<?php echo esc_attr($phone); ?>" />
                 <?php endif; ?>
 
+                <!-- Role Selection -->
+                <div class="scm-form-group">
+                    <label><?php _e('Select Your Role', 'service-charge-manager'); ?></label>
+                    <div class="scm-role-options">
+                        <label class="scm-role-option">
+                            <input type="radio" name="scm_role" value="manager" required>
+                            <span><?php _e('Manager', 'service-charge-manager'); ?></span>
+                        </label>
+                        <label class="scm-role-option">
+                            <input type="radio" name="scm_role" value="flatholder" required>
+                            <span><?php _e('Flatholder', 'service-charge-manager'); ?></span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="scm-form-group">
                     <label for="reg-name"><?php _e('Full Name', 'service-charge-manager'); ?></label>
                     <input type="text" id="reg-name" name="name" required placeholder="Enter your full name">
