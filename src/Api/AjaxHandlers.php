@@ -850,7 +850,7 @@ class AjaxHandlers
         }
 
         global $wpdb;
-        $apartments_table = $wpdb->prefix . 'apartments';
+        $apartments_table = $wpdb->prefix . 'scm_apartments';
 
         $result = $wpdb->insert(
             $apartments_table,
@@ -899,7 +899,7 @@ class AjaxHandlers
         }
 
         global $wpdb;
-        $apartments_table = $wpdb->prefix . 'apartments';
+        $apartments_table = $wpdb->prefix . 'scm_apartments';
 
         $apartments = $wpdb->get_results($wpdb->prepare(
             "SELECT id, name, location, created_at, updated_at FROM $apartments_table WHERE created_by = %d ORDER BY created_at DESC",
@@ -939,18 +939,7 @@ class AjaxHandlers
         }
 
         global $wpdb;
-        $apartments_table = $wpdb->prefix . 'apartments';
-
-        // Verify ownership
-        $apartment = $wpdb->get_row($wpdb->prepare(
-            "SELECT id, created_by FROM $apartments_table WHERE id = %d",
-            $apartment_id
-        ));
-
-        if (!$apartment || $apartment->created_by != $user_id) {
-            wp_send_json_error(array('message' => __('You cannot delete this apartment', 'service-charge-manager')));
-            return;
-        }
+        $apartments_table = $wpdb->prefix . 'scm_apartments';
 
         // Delete all flats associated with this apartment first
         $frontend = new \ServiceChargeManager\Public\Frontend();
@@ -1003,7 +992,7 @@ class AjaxHandlers
         }
 
         global $wpdb;
-        $apartments_table = $wpdb->prefix . 'apartments';
+        $apartments_table = $wpdb->prefix . 'scm_apartments';
 
         // Verify ownership
         $apartment = $wpdb->get_row($wpdb->prepare(

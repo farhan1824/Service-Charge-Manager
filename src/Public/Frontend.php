@@ -215,7 +215,7 @@ class Frontend
         // Get apartment data
         global $wpdb;
         $apartment = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}apartments WHERE id = %d",
+            "SELECT * FROM {$wpdb->prefix}scm_apartments WHERE id = %d",
             $apartment_id
         ));
 
