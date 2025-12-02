@@ -412,6 +412,129 @@ jQuery(document).ready(function ($) {
     }, 1000);
   }
 
+  /****************************************************
+   * APARTMENT & FLAT SELECTION (Registration for Flatholder)
+   ****************************************************/
+
+  // Load apartments when flatholder role is selected
+  $(document).on("change", 'input[name="scm_role"]', function () {
+    const selectedRole = $('input[name="scm_role"]:checked').val();
+
+    if (selectedRole === "flatholder") {
+      $(".scm-apartment-selection").slideDown();
+      $(".scm-flat-selection").slideUp();
+      $(".scm-flat-dropdown").val(""); // Reset flat selection
+
+      // Load apartments
+      loadApartmentsForRegistration();
+    } else {
+      $(".scm-apartment-selection").slideUp();
+      $(".scm-flat-selection").slideUp();
+      $(".scm-apartment-dropdown").val("");
+      $(".scm-flat-dropdown").val("");
+    }
+  });
+
+  // Load apartments from database
+  function loadApartmentsForRegistration() {
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_get_apartments_public",
+        nonce: scmAuth.signup_nonce,
+      },
+      success: function (response) {
+        if (response.success && response.data.apartments) {
+          const apartments = response.data.apartments;
+          const dropdown = $(".scm-apartment-dropdown");
+          dropdown.find("option:not(:first)").remove(); // Remove all except first option
+
+          apartments.forEach(function (apt) {
+            dropdown.append(
+              $("<option>").val(apt.id).text(escapeHtml(apt.name))
+            );
+          });
+        } else {
+          $(".scm-apartment-selection .scm-help-text")
+            .text(__("No apartments available", "service-charge-manager"))
+            .show();
+        }
+      },
+      error: function () {
+        $(".scm-apartment-selection .scm-help-text")
+          .text(__("Failed to load apartments", "service-charge-manager"))
+          .show();
+      },
+    });
+  }
+
+  // Load flats when apartment is selected
+  $(document).on("change", ".scm-apartment-dropdown", function () {
+    const apartmentId = $(this).val();
+
+    if (apartmentId) {
+      $(".scm-flat-selection").slideDown();
+      loadFlatsForRegistration(apartmentId);
+    } else {
+      $(".scm-flat-selection").slideUp();
+      $(".scm-flat-dropdown").find("option:not(:first)").remove();
+    }
+  });
+
+  // Load flats from database
+  function loadFlatsForRegistration(apartmentId) {
+    $.ajax({
+      url: scmAuth.ajaxurl,
+      type: "POST",
+      data: {
+        action: "scm_get_flats_public",
+        nonce: scmAuth.signup_nonce,
+        apartment_id: apartmentId,
+      },
+      success: function (response) {
+        if (
+          response.success &&
+          response.data.flats &&
+          response.data.flats.length > 0
+        ) {
+          const flats = response.data.flats;
+          const dropdown = $(".scm-flat-dropdown");
+          dropdown.find("option:not(:first)").remove();
+          dropdown.prop("disabled", false);
+          $(".scm-flat-selection .scm-help-text").hide();
+
+          flats.forEach(function (flat) {
+            dropdown.append(
+              $("<option>").val(flat.id).text(escapeHtml(flat.name))
+            );
+          });
+        } else {
+          // No flats available
+          const dropdown = $(".scm-flat-dropdown");
+          dropdown.find("option:not(:first)").remove();
+          dropdown.val("");
+          dropdown.prop("disabled", true);
+          $(".scm-flat-selection .scm-help-text")
+            .text(
+              __(
+                "No flats available for this apartment",
+                "service-charge-manager"
+              )
+            )
+            .show();
+        }
+      },
+      error: function () {
+        const dropdown = $(".scm-flat-dropdown");
+        dropdown.prop("disabled", true);
+        $(".scm-flat-selection .scm-help-text")
+          .text(__("Failed to load flats", "service-charge-manager"))
+          .show();
+      },
+    });
+  }
+
   // Registration form handling
   $("#scm-registration-form").on("submit", function (e) {
     e.preventDefault();
@@ -454,6 +577,28 @@ jQuery(document).ready(function ($) {
         buttons: [{ text: "OK", type: "primary", action: null }],
       });
       return;
+    }
+
+    // Validate flatholder selections
+    if (data.scm_role === "flatholder") {
+      if (!data.apartment_id) {
+        showModal({
+          title: "Apartment Required",
+          description: "Please select your apartment.",
+          icon: "warning",
+          buttons: [{ text: "OK", type: "primary", action: null }],
+        });
+        return;
+      }
+      if (!data.flat_id) {
+        showModal({
+          title: "Flat Required",
+          description: "Please select your flat/unit.",
+          icon: "warning",
+          buttons: [{ text: "OK", type: "primary", action: null }],
+        });
+        return;
+      }
     }
 
     submitBtn.prop("disabled", true).text("Registering...");
@@ -841,6 +986,26 @@ jQuery(document).ready(function ($) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
   }
+  // for pretty date formatting
+  function formatPrettyDate(dateString) {
+    const date = new Date(dateString);
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
+
+    // Determine ordinal suffix
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+
+    return `${day}${suffix} ${month} ${year}`;
+  }
 
   // Load apartments on page load
   function loadApartments() {
@@ -867,11 +1032,7 @@ jQuery(document).ready(function ($) {
           }
 
           apartments.forEach(function (apt) {
-            const createdDate = new Date(apt.created_at).toLocaleDateString();
-            const updatedDate = apt.updated_at
-              ? new Date(apt.updated_at).toLocaleDateString()
-              : "-";
-
+            const createdDate = formatPrettyDate(apt.created_at);
             container.append(
               '<div class="scm-apartment-card" data-apartment-id="' +
                 apt.id +
@@ -884,18 +1045,16 @@ jQuery(document).ready(function ($) {
                 escapeAttr(apt.name) +
                 '" data-location="' +
                 escapeAttr(apt.location || "") +
-                '" title="Edit apartment">✎</button><button type="button" class="scm-delete-apartment-icon-btn" data-apartment-id="' +
+                '" title="Edit apartment"><i class="fa-solid fa-pencil "></i></button><button type="button" class="scm-delete-apartment-icon-btn" data-apartment-id="' +
+                // '" title="Edit apartment">✎</button><button type="button" class="scm-delete-apartment-icon-btn" data-apartment-id="' +
                 apt.id +
-                '" title="Delete apartment">🗑</button></div></div></div>' +
+                '" title="Delete apartment"><i class="fa-solid fa-trash "></i></button></div></div></div>' +
                 '<div class="scm-apartment-card-body">' +
                 '<div class="scm-apartment-info-row"><span class="scm-apartment-label">Location:</span><span class="scm-apartment-value">' +
                 escapeHtml(apt.location || "N/A") +
                 "</span></div>" +
                 '<div class="scm-apartment-info-row"><span class="scm-apartment-label">Created:</span><span class="scm-apartment-value">' +
                 createdDate +
-                "</span></div>" +
-                '<div class="scm-apartment-info-row"><span class="scm-apartment-label">Updated:</span><span class="scm-apartment-value">' +
-                updatedDate +
                 "</span></div>" +
                 "</div>" +
                 "</div>"
@@ -1225,6 +1384,10 @@ jQuery(document).ready(function ($) {
           }
 
           flats.forEach(function (flat) {
+            // Display holder name if available, otherwise show "-"
+            const holderName = flat.display_name
+              ? escapeHtml(flat.display_name)
+              : "-";
             container.append(
               '<tr data-flat-id="' +
                 flat.id +
@@ -1235,7 +1398,9 @@ jQuery(document).ready(function ($) {
                 "<td>" +
                 escapeHtml(flat.floor_number || "-") +
                 "</td>" +
-                "<td>-</td>" +
+                "<td>" +
+                holderName +
+                "</td>" +
                 "</tr>"
             );
           });
@@ -1356,6 +1521,6 @@ jQuery(document).ready(function ($) {
   $(document).on("click", "#scm-back-to-apartments-btn", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    window.location.href = scmAuth.dashboard_url || home_url();
+    window.location.href = "index.php/dashboard";
   });
 });

@@ -64,6 +64,10 @@ class AjaxHandlers
         add_action('wp_ajax_scm_delete_flat', array($this, 'handle_delete_flat'));
         add_action('wp_ajax_scm_update_flat', array($this, 'handle_update_flat'));
 
+        // Public apartment and flat loaders (for signup/frontend)
+        add_action('wp_ajax_nopriv_scm_get_apartments_public', array($this, 'handle_get_apartments_public'));
+        add_action('wp_ajax_nopriv_scm_get_flats_public', array($this, 'handle_get_flats_public'));
+
         // Logout handler (logged-in users only)
         add_action('wp_ajax_scm_logout', array($this, 'handle_logout'));
 
@@ -270,13 +274,13 @@ class AjaxHandlers
             // Generate OTP
             $otp = wp_rand(100000, 999999);
 
-            // Store OTP with 10-minute expiry
+            // Store OTP with 2-minute expiry
             $transient_key = 'scm_otp_' . $phone;
-            set_transient($transient_key, $otp, 10 * MINUTE_IN_SECONDS);
+            set_transient($transient_key, $otp, 2 * MINUTE_IN_SECONDS);
 
             // Prepare SMS message
             $message = sprintf(
-                __('Your Service Charge Manager verification code is: %d. Valid for 10 minutes.', 'service-charge-manager'),
+                __('Your Service Charge Manager verification code is: %d. Valid for 2 minutes.', 'service-charge-manager'),
                 $otp
             );
 
@@ -362,7 +366,7 @@ class AjaxHandlers
             $otp = wp_rand(100000, 999999);
 
             // Store OTP in transient (10 minutes expiry)
-            $transient_set = set_transient('scm_otp_' . $phone, $otp, 10 * MINUTE_IN_SECONDS);
+            $transient_set = set_transient('scm_otp_' . $phone, $otp, 2 * MINUTE_IN_SECONDS);
 
             if (!$transient_set) {
                 wp_send_json_error(array(
@@ -509,10 +513,10 @@ class AjaxHandlers
 
         // Collect other fields (these may be empty/null and that's fine)
         $address = isset($_POST['address']) ? sanitize_textarea_field($_POST['address']) : '';
-        $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
-        $state = isset($_POST['state']) ? sanitize_text_field($_POST['state']) : '';
-        $postal_code = isset($_POST['postal_code']) ? sanitize_text_field($_POST['postal_code']) : '';
-        $country = isset($_POST['country']) ? sanitize_text_field($_POST['country']) : '';
+        // $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+        // $state = isset($_POST['state']) ? sanitize_text_field($_POST['state']) : '';
+        // $postal_code = isset($_POST['postal_code']) ? sanitize_text_field($_POST['postal_code']) : '';
+        // $country = isset($_POST['country']) ? sanitize_text_field($_POST['country']) : '';
 
         // Get user-selected role from registration form
         $selected_role = isset($_POST['scm_role']) ? sanitize_text_field($_POST['scm_role']) : 'flatholder';
@@ -525,15 +529,65 @@ class AjaxHandlers
             'phone' => $phone,
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'email' => $email,
+            // 'email' => $email,
             'address' => $address,
             'city' => $district,
-            'state' => $state,
-            'postal_code' => $postal_code,
-            'country' => $country,
+            // 'state' => $state,
+            // 'postal_code' => $postal_code,
+            // 'country' => $country,
             'scm_role' => $scm_role,
             'scm_status' => 'active'
         );
+
+        // If flatholder, store apartment and flat IDs
+        $apartment_id = null;
+        $flat_id = null;
+        if ($selected_role === 'flatholder') {
+            $apartment_id = intval($_POST['apartment_id'] ?? 0);
+            $flat_id = intval($_POST['flat_id'] ?? 0);
+
+            if (!$apartment_id || !$flat_id) {
+                wp_send_json_error(array(
+                    'message' => __('Apartment and Flat selection are required for flatholders.', 'service-charge-manager')
+                ));
+                return;
+            }
+
+            // Verify that the flat exists and belongs to the apartment
+            global $wpdb;
+            $flats_table = $wpdb->prefix . 'scm_flats';
+            $usermeta_table = $wpdb->prefix . 'usermeta';
+
+            $flat = $wpdb->get_row($wpdb->prepare(
+                "SELECT id FROM $flats_table WHERE id = %d AND apartment_id = %d",
+                $flat_id,
+                $apartment_id
+            ));
+
+            if (!$flat) {
+                wp_send_json_error(array(
+                    'message' => __('Selected flat does not exist or does not belong to the selected apartment.', 'service-charge-manager')
+                ));
+                return;
+            }
+
+            // Check if this flat is already assigned to another user (prevent duplicates)
+            $existing_holder = $wpdb->get_var($wpdb->prepare(
+                "SELECT user_id FROM $usermeta_table WHERE meta_key = 'scm_flat_id' AND meta_value = %d",
+                $flat_id
+            ));
+
+            if ($existing_holder) {
+                wp_send_json_error(array(
+                    'message' => __('This flat is already assigned to another flatholder. Please choose a different flat.', 'service-charge-manager')
+                ));
+                return;
+            }
+
+            // Add to user data
+            $userData['scm_apartment_id'] = $apartment_id;
+            $userData['scm_flat_id'] = $flat_id;
+        }
 
         // ✅ Check if phone already exists before creating user
         if (!$this->userManager->isPhoneUnique($phone)) {
@@ -1062,8 +1116,22 @@ class AjaxHandlers
             return;
         }
 
-        $frontend = new \ServiceChargeManager\Public\Frontend();
-        $flats = $frontend->get_flats_by_apartment($apartment_id);
+        global $wpdb;
+        $flats_table = $wpdb->prefix . 'scm_flats';
+        $users_table = $wpdb->prefix . 'users';
+        $usermeta_table = $wpdb->prefix . 'usermeta';
+
+        // Get flats with flatholder info
+        $flats = $wpdb->get_results($wpdb->prepare(
+            "SELECT f.id, f.name, f.floor_number, f.apartment_id,
+                    u.ID as holder_id, u.user_login, u.display_name
+            FROM $flats_table f
+            LEFT JOIN $usermeta_table um ON (f.id = CAST(um.meta_value AS UNSIGNED) AND um.meta_key = 'scm_flat_id')
+            LEFT JOIN $users_table u ON um.user_id = u.ID
+            WHERE f.apartment_id = %d
+            ORDER BY f.name ASC",
+            $apartment_id
+        ));
 
         wp_send_json_success(array(
             'flats' => $flats
@@ -1178,6 +1246,56 @@ class AjaxHandlers
             ));
         } else {
             wp_send_json_error(array('message' => __('Failed to update flat', 'service-charge-manager')));
+        }
+    }
+
+    /**
+     * Get all apartments for public/signup (no auth required)
+     */
+    public function handle_get_apartments_public()
+    {
+        check_ajax_referer('scm_signup', 'nonce', false);
+
+        global $wpdb;
+        $apartments_table = $wpdb->prefix . 'scm_apartments';
+
+        $apartments = $wpdb->get_results("
+            SELECT id, name, location FROM $apartments_table ORDER BY name ASC
+        ");
+
+        if ($apartments) {
+            wp_send_json_success(array('apartments' => $apartments));
+        } else {
+            wp_send_json_error(array('message' => __('No apartments found', 'service-charge-manager')));
+        }
+    }
+
+    /**
+     * Get flats for a specific apartment (public/signup - no auth required)
+     */
+    public function handle_get_flats_public()
+    {
+        check_ajax_referer('scm_signup', 'nonce', false);
+
+        $apartment_id = intval($_POST['apartment_id'] ?? 0);
+
+        if (empty($apartment_id)) {
+            wp_send_json_error(array('message' => __('Invalid apartment ID', 'service-charge-manager')));
+            return;
+        }
+
+        global $wpdb;
+        $flats_table = $wpdb->prefix . 'scm_flats';
+
+        $flats = $wpdb->get_results($wpdb->prepare(
+            "SELECT id, name, floor_number FROM $flats_table WHERE apartment_id = %d ORDER BY name ASC",
+            $apartment_id
+        ));
+
+        if ($flats) {
+            wp_send_json_success(array('flats' => $flats));
+        } else {
+            wp_send_json_error(array('message' => __('No flats found for this apartment', 'service-charge-manager')));
         }
     }
 }

@@ -28,9 +28,6 @@ class DatabaseInstaller
         // Require WordPress upgrade functions
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-        // Add custom user columns first
-        self::add_user_columns();
-
         // Get current version
         $current_version = get_option(self::VERSION_OPTION, 0);
 
@@ -118,17 +115,6 @@ class DatabaseInstaller
             dbDelta($sql);
         }
     }
-
-    /**
-     * Add custom columns to WordPress users table
-     *
-     * @return void
-     */
-    private static function add_user_columns()
-    {
-        // User columns are handled through user meta, not direct table columns
-    }
-
     /**
      * Check if database needs upgrade
      *

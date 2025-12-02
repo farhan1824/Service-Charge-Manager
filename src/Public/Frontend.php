@@ -11,6 +11,7 @@ class Frontend
     {
         add_action('init', array($this, 'register_shortcodes'));
         add_action('init', array('ServiceChargeManager\Public\WorkflowManager', 'init'));
+        add_action('wp', array($this, 'redirect_home_if_needed'));
 
         // Set extended auth cookie expiration (2 years)
         add_filter('auth_cookie_expiration', array($this, 'extend_auth_cookie_expiration'), 10, 3);
@@ -372,5 +373,31 @@ class Frontend
         );
 
         return $result !== false;
+    }
+
+    /**
+     * Redirect home page based on user login status
+     * - If logged in: redirect to dashboard
+     * - If not logged in: redirect to show-signup-or-login
+     *
+     * @return void
+     */
+    public function redirect_home_if_needed()
+    {
+        // Only run on homepage
+        if (!is_front_page() && !is_home()) {
+            return;
+        }
+
+        // Check if user is logged in
+        if (is_user_logged_in()) {
+            // Redirect to dashboard
+            wp_redirect(home_url('/index.php/dashboard/'));
+            exit;
+        } else {
+            // Redirect to signup/login page
+            wp_redirect(home_url('/index.php/show-signup-or-login/'));
+            exit;
+        }
     }
 }

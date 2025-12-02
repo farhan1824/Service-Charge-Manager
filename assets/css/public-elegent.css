@@ -1362,14 +1362,13 @@
 
     .scm-apartment-label {
         font-size: 15px;
-        font-weight: 600;
+        font-weight: 700;
         color: var(--scm-text);
     }
 
     .scm-apartment-value {
         font-size: 1rem;
-        /* font-weight: ; */
-        font-weight: 500;
+        font-weight: 400;
     }
 }
 
@@ -1789,3 +1788,9 @@
         font-size: 0.8125rem;
     }
 }
+
+
+
+/********************************************
+icon styles for apartment table actions
+***********************************************/

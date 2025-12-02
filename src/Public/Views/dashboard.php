@@ -33,7 +33,7 @@ if (!isset($user_data)) {
                 <div class="scm-card-header-top">
                     <h2><?php echo esc_html__('Your Information', 'service-charge-manager'); ?></h2>
                     <button type="button" id="scm-edit-icon-btn" class="scm-edit-icon-btn" title="<?php echo esc_attr__('Edit Information', 'service-charge-manager'); ?>">
-                        ✎
+                        <i class="fa-solid fa-pencil "></i>
                     </button>
                 </div>
             </div>

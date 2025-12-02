@@ -49,6 +49,24 @@ $phone = isset($_SESSION['scm_verified_phone']) ? $_SESSION['scm_verified_phone'
                     </div>
                 </div>
 
+                <!-- Apartment Selection (Flatholder only) -->
+                <div class="scm-form-group scm-apartment-selection" style="display: none;">
+                    <label for="reg-apartment"><?php _e('Select Your Apartment', 'service-charge-manager'); ?> <span class="scm-required">*</span></label>
+                    <select id="reg-apartment" name="apartment_id" class="scm-apartment-dropdown">
+                        <option value=""><?php _e('-- Select Apartment --', 'service-charge-manager'); ?></option>
+                    </select>
+                    <small class="scm-help-text" style="display: none; color: #d32f2f;"></small>
+                </div>
+
+                <!-- Flat Selection (Flatholder only) -->
+                <div class="scm-form-group scm-flat-selection" style="display: none;">
+                    <label for="reg-flat"><?php _e('Select Your Flat/Unit', 'service-charge-manager'); ?> <span class="scm-required">*</span></label>
+                    <select id="reg-flat" name="flat_id" class="scm-flat-dropdown">
+                        <option value=""><?php _e('-- Select Flat/Unit --', 'service-charge-manager'); ?></option>
+                    </select>
+                    <small class="scm-help-text" style="display: none; color: #d32f2f;"></small>
+                </div>
+
                 <div class="scm-form-group">
                     <label for="reg-name"><?php _e('Full Name', 'service-charge-manager'); ?></label>
                     <input type="text" id="reg-name" name="name" required placeholder="Enter your full name">

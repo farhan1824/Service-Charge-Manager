@@ -45,6 +45,12 @@ class WorkflowManager
 
     public static function enforceWorkflow($step)
     {
+        // If user is logged in, they can access dashboard directly
+        if (is_user_logged_in() && $step === 'dashboard') {
+            return;
+        }
+
+        // Otherwise check workflow progression
         if (!self::canAccessStep($step)) {
             wp_redirect(home_url('/index.php/show-signup-or-login')); // Redirect to sign page
             exit;
