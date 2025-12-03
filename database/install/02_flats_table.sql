@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS {WPDB_PREFIX}scm_flats (
     KEY idx_created_by (created_by),
     KEY idx_updated_by (updated_by),
     CONSTRAINT fk_scm_flats_apartment FOREIGN KEY (apartment_id) REFERENCES {WPDB_PREFIX}scm_apartments(id) ON DELETE CASCADE,
+    CONSTRAINT fk_scm_flats_holder FOREIGN KEY (holder_id) REFERENCES {WPDB_PREFIX}users(ID) ON DELETE SET NULL,
     CONSTRAINT fk_scm_flats_created_by FOREIGN KEY (created_by) REFERENCES {WPDB_PREFIX}users(ID) ON DELETE RESTRICT,
     CONSTRAINT fk_scm_flats_updated_by FOREIGN KEY (updated_by) REFERENCES {WPDB_PREFIX}users(ID) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

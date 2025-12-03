@@ -416,6 +416,11 @@ jQuery(document).ready(function ($) {
    * APARTMENT & FLAT SELECTION (Registration for Flatholder)
    ****************************************************/
 
+  // Load apartments when page loads (so they're ready when flatholder role is selected)
+  $(document).ready(function () {
+    loadApartmentsForRegistration();
+  });
+
   // Load apartments when flatholder role is selected
   $(document).on("change", 'input[name="scm_role"]', function () {
     const selectedRole = $('input[name="scm_role"]:checked').val();
@@ -425,7 +430,7 @@ jQuery(document).ready(function ($) {
       $(".scm-flat-selection").slideUp();
       $(".scm-flat-dropdown").val(""); // Reset flat selection
 
-      // Load apartments
+      // Apartments already loaded on page init, but call again to ensure fresh data
       loadApartmentsForRegistration();
     } else {
       $(".scm-apartment-selection").slideUp();

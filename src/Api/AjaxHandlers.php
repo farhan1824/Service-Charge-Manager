@@ -613,6 +613,19 @@ class AjaxHandlers
             ));
         }
 
+        // If flatholder, update the flat's holder_id column
+        if ($selected_role === 'flatholder' && isset($flat_id) && $flat_id) {
+            global $wpdb;
+            $flats_table = $wpdb->prefix . 'scm_flats';
+
+            $wpdb->update(
+                $flats_table,
+                array('holder_id' => $user_id),
+                array('id' => $flat_id),
+                array('%d'),
+                array('%d')
+            );
+        }
 
         // Clear the verification marker from session
         unset($_SESSION['scm_verified_phone']);
@@ -1119,15 +1132,13 @@ class AjaxHandlers
         global $wpdb;
         $flats_table = $wpdb->prefix . 'scm_flats';
         $users_table = $wpdb->prefix . 'users';
-        $usermeta_table = $wpdb->prefix . 'usermeta';
 
-        // Get flats with flatholder info
+        // Get flats with flatholder info using holder_id column
         $flats = $wpdb->get_results($wpdb->prepare(
-            "SELECT f.id, f.name, f.floor_number, f.apartment_id,
-                    u.ID as holder_id, u.user_login, u.display_name
+            "SELECT f.id, f.name, f.floor_number, f.apartment_id, f.holder_id,
+                    u.ID, u.user_login, u.display_name
             FROM $flats_table f
-            LEFT JOIN $usermeta_table um ON (f.id = CAST(um.meta_value AS UNSIGNED) AND um.meta_key = 'scm_flat_id')
-            LEFT JOIN $users_table u ON um.user_id = u.ID
+            LEFT JOIN $users_table u ON f.holder_id = u.ID
             WHERE f.apartment_id = %d
             ORDER BY f.name ASC",
             $apartment_id
@@ -1263,11 +1274,10 @@ class AjaxHandlers
             SELECT id, name, location FROM $apartments_table ORDER BY name ASC
         ");
 
-        if ($apartments) {
-            wp_send_json_success(array('apartments' => $apartments));
-        } else {
-            wp_send_json_error(array('message' => __('No apartments found', 'service-charge-manager')));
-        }
+        // Always return success with apartments array (empty if none exist)
+        wp_send_json_success(array(
+            'apartments' => $apartments ? $apartments : []
+        ));
     }
 
     /**
@@ -1287,15 +1297,16 @@ class AjaxHandlers
         global $wpdb;
         $flats_table = $wpdb->prefix . 'scm_flats';
 
+        // Only return flats where holder_id IS NULL (unoccupied flats)
         $flats = $wpdb->get_results($wpdb->prepare(
-            "SELECT id, name, floor_number FROM $flats_table WHERE apartment_id = %d ORDER BY name ASC",
+            "SELECT id, name, floor_number FROM $flats_table WHERE apartment_id = %d AND holder_id IS NULL ORDER BY name ASC",
             $apartment_id
         ));
 
         if ($flats) {
             wp_send_json_success(array('flats' => $flats));
         } else {
-            wp_send_json_error(array('message' => __('No flats found for this apartment', 'service-charge-manager')));
+            wp_send_json_error(array('message' => __('No available flats for this apartment', 'service-charge-manager')));
         }
     }
 }
