@@ -652,7 +652,7 @@ jQuery(document).ready(function ($) {
       e.stopPropagation();
       console.log("Edit icon clicked - vanilla JS");
       document
-        .querySelectorAll(".scm-value")
+        .querySelectorAll(".scm-value:not(.scm-readonly)")
         .forEach((el) => (el.style.display = "none"));
       document
         .querySelectorAll(".scm-edit-field")
@@ -673,7 +673,7 @@ jQuery(document).ready(function ($) {
         .querySelectorAll(".scm-edit-field")
         .forEach((el) => (el.style.display = "none"));
       document
-        .querySelectorAll(".scm-value")
+        .querySelectorAll(".scm-value:not(.scm-readonly)")
         .forEach((el) => (el.style.display = ""));
       document.getElementById("scm-edit-actions").style.display = "none";
       document.getElementById("scm-edit-icon-btn").style.display = "";
@@ -692,7 +692,7 @@ jQuery(document).ready(function ($) {
 
     // Map HTML data-key → DB keys
     const keyMapping = {
-      first_name: "first_name", // WP user field
+      name: "first_name", // Full name mapped to first_name
       address: "scm_address", // User meta with prefix
     };
 
@@ -724,7 +724,7 @@ jQuery(document).ready(function ($) {
 
           // Switch UI back to read mode
           $(".scm-edit-field").hide();
-          $(".scm-value").show();
+          $(".scm-value:not(.scm-readonly)").show();
           $("#scm-edit-actions").hide();
           $("#scm-edit-icon-btn").show();
 

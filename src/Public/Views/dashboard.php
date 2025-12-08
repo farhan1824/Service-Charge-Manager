@@ -40,28 +40,27 @@ if (!isset($user_data)) {
             <div class="scm-card-body">
                 <div class="scm-info-row">
                     <span class="scm-info-label"><?php echo esc_html__('Name', 'service-charge-manager'); ?></span>
-                    <span class="scm-value" data-key="first_name"><?php echo esc_html($user_data['first_name'] . " " . $user_data["last_name"]); ?></span>
-                    <input class="scm-edit-field" data-key="first_name" type="text"
-                        value="<?php echo esc_attr($user_data['first_name']); ?>" style="display:none;">
+                    <span class="scm-value" data-key="name"><?php echo esc_html($user_data['first_name'] . " " . $user_data["last_name"]); ?></span>
+                    <input class="scm-edit-field" data-key="name" type="text"
+                        value="<?php echo esc_attr($user_data['first_name'] . " " . $user_data['last_name']); ?>" style="display:none;" placeholder="Enter your full name">
                 </div>
 
                 <div class="scm-info-row">
                     <span class="scm-info-label"><?php echo esc_html__('Phone', 'service-charge-manager'); ?></span>
-                    <span class="scm-value" data-key="phone"><?php echo esc_html($user_data['phone']); ?><?php if (empty($user_data['phone'])) {
-                                                                                                                echo '<!-- Phone is empty in $user_data -->';
-                                                                                                            } ?></span>
+                    <span class="scm-value scm-readonly" data-key="phone"><?php echo esc_html($user_data['phone']); ?><?php if (empty($user_data['phone'])) {
+                                                                                                                            echo '<!-- Phone is empty in $user_data -->';
+                                                                                                                        } ?></span>
                 </div>
 
                 <div class="scm-info-row">
                     <span class="scm-info-label"><?php echo esc_html__('District', 'service-charge-manager'); ?></span>
-                    <span class="scm-value" data-key="district"><?php echo esc_html($user_data['district']); ?></span>
+                    <span class="scm-value scm-readonly" data-key="district"><?php echo esc_html($user_data['district']); ?></span>
                 </div>
 
                 <div class="scm-info-row">
                     <span class="scm-info-label"><?php echo esc_html__('Address', 'service-charge-manager'); ?></span>
                     <span class="scm-value" data-key="address"><?php echo esc_html($user_data['address']); ?></span>
-                    <input class="scm-edit-field" data-key="address" type="textarea"
-                        value="<?php echo esc_attr($user_data['address']); ?>" style="display:none;">
+                    <textarea class="scm-edit-field" data-key="address" style="display:none;" placeholder="Enter your full address"><?php echo esc_attr($user_data['address']); ?></textarea>
                 </div>
 
                 <div id="scm-update-response"></div>
